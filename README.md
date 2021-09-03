@@ -10,5 +10,3 @@ practicing
 fin
 woops I skipped the 7th commit
 attempt 11
-This READme file contains information about my uploaded assignments
-Assignment 2.txt

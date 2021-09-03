@@ -1,0 +1,28 @@
+list.files(path="data")
+
+#Write a command that lists all of the .csv files found in the Data/ directory and stores that list in an object called “csv_files”
+csv_files <- list.files(path = "data",pattern = ".csv",full.names = TRUE)
+
+#Find how many files match that description using the length() function
+length(csv_files)
+
+#Open the wingspan_vs_mass.csv file and store the contents as an R object named “df” using the read.csv() function
+df <- read.csv(csv_files[29])
+
+#Inspect the first 5 lines of this data set using the head() function
+head(df[1:5])
+
+#Find any files (recursively) in the Data/ directory that begin with the letter “b” (lowercase)\
+b_files <- list.files(path="data",recursive = TRUE,full.names = TRUE,pattern = "^[b]")
+
+#Write a command that displays the first line of each of those “b” files (this is tricky… use a for-loop
+for(i in 1:3){
+  bf <- read_lines(file=b_files[i])
+  print(head(bf,1))
+}
+
+#Do the same thing for all files that end in “.csv”
+for(i in 1:29){
+  df <- read_csv(file = csv_files[i])
+  print(head(df,1))
+  }
