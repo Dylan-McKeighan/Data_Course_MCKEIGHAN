@@ -1,0 +1,27 @@
+Final project
+
+Goal:
+To determine what state, 3 years from now, will be the ideal place to buy a home to use as a rental property.
+
+How:
+Analyze the following metrics over the past 10-20 years to predict a trend for the next 3 years.
+
+Metrics to look for:
+- Average total price for a home (median home value).
+- Average monthly house payment.
+- Average monthly rent price.
+- Price of property tax.
+- Number of universities.
+- Average annual income.
+- Unemployment rate vs employment gains and job market growth.
+- Number of listings and vacancies.
+- Number of renter occupied households.
+- Population growth per year.
+
+Data sources:
+- Bureau of Labor Statistics
+- Bureau of Economic Analysis
+- United States Cenus Bureau
+- National Association of Realtors
+
+states
