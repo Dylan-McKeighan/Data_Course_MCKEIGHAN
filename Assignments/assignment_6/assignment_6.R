@@ -1,5 +1,6 @@
 library(tidyverse)
 library(janitor)
+library(gganimate)
 
 # Load the data
 dat <- read_csv("BioLog_Plate_Data.csv")
@@ -39,29 +40,22 @@ dat %>%
   theme_minimal() +
   labs(x="Time", y="Absorbance", color="Type")
 
-dat %>% 
-  filter(substrate == "Itaconic Acid") %>% 
-  group_by(hrs, dilution) %>% 
-  summarize(Mean_absorbance = mean(absorbance)) %>% 
-  View()
+ggsave("plot1.jpeg")
 
-dat %>% 
+dat2 <- dat %>% 
   filter(substrate == "Itaconic Acid") %>% 
-  group_by(hrs) %>% 
-  mutate(Mean_absorbance = mean(absorbance)) %>% 
-  View()
-  
-group_by(hrs, dilution) %>% 
-  summarize(Mean_absorbance = mean(absorbance)) %>% 
-  View()
+  group_by(dilution, hrs, sample_id) %>% 
+  summarize(Mean_absorbance = mean(absorbance))
 
-dat %>% 
-  select(sample_id, substrate, rep, dilution, absorbance, hrs) %>% 
-  filter(substrate == "Itaconic Acid")
-  
-dat %>% 
-  filter(substrate == "Itaconic Acid") %>% 
-  ggplot(aes(x=hrs, y=absorbance, color=sample_id)) +
-  geom_smooth(se = FALSE) +
-  facet_wrap(~dilution) +
-  theme_minimal()
+plot2 <- dat2 %>% 
+  ggplot(aes(x=hrs, y=Mean_absorbance, color = sample_id)) +
+  geom_line() +
+  facet_wrap(~ dilution) +
+  labs(x="Time", colors = "Sample ID") +
+  theme_minimal() +
+  transition_reveal(hrs)
+
+animate(plot2)
+
+animate(plot2, fps = 10, width = 750, height = 450)
+anim_save("plot2.gif")
