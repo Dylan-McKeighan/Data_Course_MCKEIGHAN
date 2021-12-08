@@ -1,0 +1,85 @@
+---
+title: "Exam_3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(tidyverse)
+library(broom)
+
+theme_set(theme_minimal())
+
+```
+
+## Tasks:
+
+I.      Load and clean FacultySalaries_1995.csv file
+Re-create the graph shown in "fig1.png"
+Export it to your Exam_3 folder as LASTNAME_Fig_1.jpg (note, that's a jpg, not a png)
+Please pay attention to what variables are on this graph.  This task is really all about whether you can make a tidy dataset out of something a bit wonky. Refer back to the video where we cleaned "Bird_Measurements.csv"
+
+```{r}
+df <- read_csv("FacultySalaries_1995.csv")
+
+clean <- df %>% 
+  select(ends_with("Salary"),"FedID", "Tier", "State") %>% 
+  pivot_longer(starts_with("Avg"), names_to = "Rank", values_to = "Salary", names_prefix = "Avg") %>% 
+  mutate(Rank = str_remove_all(Rank, "ProfSalary")) %>% 
+  filter(Tier != "VIIB")
+
+ggplot(clean, aes(x=Rank, y=Salary, fill=Rank)) +
+  geom_boxplot() +
+  facet_wrap(~Tier) +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+ggsave("McKeighan_Fig_1.jpg")
+
+```
+II.     Export an ANOVA table to a file called "Salary_ANOVA_Summary.txt"
+        The ANOVA model should test the influence of "State", "Tier", and "Rank" on "Salary" but should NOT include any interactions between those predictors.
+        
+```{r}
+mod <- clean %>% 
+  aov(Salary ~ State + Tier + Rank, data=.)
+
+sink("Salary_ANOVA_Summary.txt")
+summary(mod)
+sink(NULL)
+
+```
+
+III.    The rest of the test uses another data set. The "Juniper_Oils.csv" data. Get it loaded and take a look.
+        It's not exactly tidy either. Get used to that. It's real data collected as part of a collaboration between Young Living Inc. and UVU Microbiology. A number of dead cedar trees were collected and the chemical composition of their essential oil content was measured. The hypothesis was that certain chemicals would degrade over time since they died in fires. So there are a bunch of columns for chemical compounds, and a column for "YearsSinceBurn." The values under each chemical are Mass-Spec concentrations.
+
+```{r}
+df <- read_csv("Juniper_Oils.csv")
+chems <- c("alpha-pinene","para-cymene","alpha-terpineol","cedr-9-ene","alpha-cedrene","beta-cedrene","cis-thujopsene","alpha-himachalene","beta-chamigrene","cuparene","compound 1","alpha-chamigrene","widdrol","cedrol","beta-acorenol","alpha-acorenol","gamma-eudesmol","beta-eudesmol","alpha-eudesmol","cedr-8-en-13-ol","cedr-8-en-15-ol","compound 2","thujopsenal")
+
+clean <- df %>% 
+  pivot_longer(chems, names_to = "Compound", values_to = "Concentration")
+```
+IV.     Make me a graph of the following:
+        x = YearsSinceBurn
+        y = Concentration
+        facet = ChemicalID (use free y-axis scales)
+        See Fig2.png for an idea of what I'm looking for
+        
+```{r}
+clean %>% 
+  ggplot(aes(x=YearsSinceBurn, y=Concentration)) +
+  geom_smooth() +
+  facet_wrap(~Compound, scales = "free_y")
+```
+V.      Use a generalized linear model to find which chemicals show concentrations that are significantly (significant, as in P < 0.05) affected by "Years Since Burn". Use the tidy() function from the broom R package in order to produce a data frame showing JUST the significant chemicals and their model output (coefficient estimates, p-values, etc)   
+```{r}
+mod <- glm(data = clean,
+           formula = Concentration ~ Compound*YearsSinceBurn)
+tidy(mod) %>% 
+  filter(p.value < 0.05)
+```
+
+
+
+
